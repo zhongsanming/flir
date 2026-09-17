@@ -1209,21 +1209,19 @@ void TritonToLinalgIncubatedPass::runOnOperation() {
     if (!isa<UnknownLoc>(op->getLoc()))
       continue;
 
-    Location resolved;
-    bool found = false;
+    Operation *locatedUser = nullptr;
     for (Operation *user : op->getUsers()) {
       if (isa<UnknownLoc>(user->getLoc()))
         continue;
-      resolved = user->getLoc();
-      found = true;
+      locatedUser = user;
       break;
     }
 
-    if (!found) {
+    if (!locatedUser) {
       op->emitWarning() << *op << " and its users all have no location!";
       continue;
     }
-    op->setLoc(resolved);
+    op->setLoc(locatedUser->getLoc());
   }
 }
 
